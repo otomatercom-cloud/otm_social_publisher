@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_social_root" name="Social Publisher" sequence="45"
+              groups="otm_social_publisher.group_user"/>
+    <menuitem id="menu_social_posts" name="Posts" parent="menu_social_root"
+              action="action_social_post" sequence="10"/>
+    <menuitem id="menu_social_to_approve" name="To Approve" parent="menu_social_root"
+              action="action_social_post_to_approve" sequence="20"
+              groups="otm_social_publisher.group_approver"/>
+    <menuitem id="menu_social_config" name="Configuration" parent="menu_social_root" sequence="90"
+              groups="otm_social_publisher.group_manager"/>
+    <menuitem id="menu_social_accounts" name="Accounts" parent="menu_social_config"
+              action="action_social_account" sequence="10"/>
+</odoo>

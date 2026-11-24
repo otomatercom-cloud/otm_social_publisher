@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_social_account_form" model="ir.ui.view">
+        <field name="name">otm.social.account.form</field>
+        <field name="model">otm.social.account</field>
+        <field name="arch" type="xml">
+            <form string="Social Account">
+                <header>
+                    <button name="action_test_connection" string="Test Connection" type="object"
+                            class="btn-primary"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <group>
+                        <group name="group_main">
+                            <field name="name"/>
+                            <field name="platform"/>
+                            <field name="external_id"/>
+                            <field name="access_token" password="True"/>
+                            <field name="graph_version"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group name="group_status">
+                            <field name="has_token"/>
+                            <field name="connection_state"/>
+                            <field name="last_check"/>
+                            <field name="last_error"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_social_account_list" model="ir.ui.view">
+        <field name="name">otm.social.account.list</field>
+        <field name="model">otm.social.account</field>
+        <field name="arch" type="xml">
+            <list string="Social Accounts">
+                <field name="name"/>
+                <field name="platform"/>
+                <field name="external_id"/>
+                <field name="connection_state" widget="badge"
+                       decoration-success="connection_state == 'ok'"
+                       decoration-danger="connection_state == 'error'"/>
+                <field name="last_check"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_social_account" model="ir.actions.act_window">
+        <field name="name">Accounts</field>
+        <field name="res_model">otm.social.account</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_otm_social_post_user,otm.social.post user,model_otm_social_post,group_user,1,1,1,1
+access_otm_social_post_manager,otm.social.post manager,model_otm_social_post,group_manager,1,1,1,1
+access_otm_social_account_user,otm.social.account user,model_otm_social_account,group_user,1,0,0,0
+access_otm_social_account_manager,otm.social.account manager,model_otm_social_account,group_manager,1,1,1,1
+access_otm_social_post_target_user,otm.social.post.target user,model_otm_social_post_target,group_user,1,0,0,0
+access_otm_social_post_target_manager,otm.social.post.target manager,model_otm_social_post_target,group_manager,1,1,1,1
+access_otm_social_post_reject_wizard,otm.social.post.reject.wizard approver,model_otm_social_post_reject_wizard,group_approver,1,1,1,1

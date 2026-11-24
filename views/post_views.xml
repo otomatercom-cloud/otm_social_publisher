@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_social_post_form" model="ir.ui.view">
+        <field name="name">otm.social.post.form</field>
+        <field name="model">otm.social.post</field>
+        <field name="arch" type="xml">
+            <form string="Social Post">
+                <header>
+                    <button name="action_submit" string="Submit for Approval" type="object"
+                            class="btn-primary" invisible="state not in ('draft', 'rejected')"/>
+                    <button name="action_approve" string="Approve" type="object" class="btn-primary"
+                            invisible="state != 'to_approve'"
+                            groups="otm_social_publisher.group_approver"/>
+                    <button name="action_reject" string="Reject" type="object"
+                            invisible="state != 'to_approve'"
+                            groups="otm_social_publisher.group_approver"/>
+                    <button name="action_publish_now" string="Publish Now" type="object"
+                            class="btn-primary" invisible="state not in ('approved', 'publishing')"
+                            groups="otm_social_publisher.group_approver"
+                            confirm="Publish this post now to all selected accounts?"/>
+                    <button name="action_retry_failed" string="Retry Failed" type="object"
+                            invisible="state not in ('failed', 'partial')"
+                            groups="otm_social_publisher.group_approver"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object"
+                            invisible="state not in ('to_approve', 'rejected', 'cancelled')"/>
+                    <button name="action_cancel" string="Cancel" type="object"
+                            invisible="state not in ('draft', 'to_approve', 'approved', 'rejected')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,to_approve,approved,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h2><field name="name"/></h2>
+                        <h1>
+                            <field name="title" placeholder="e.g. Onam Offer Poster"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group name="group_publish">
+                            <field name="media_type" readonly="state not in ('draft', 'rejected')"/>
+                            <field name="account_ids" widget="many2many_tags"
+                                   options="{'no_create': True}"
+                                   readonly="state not in ('draft', 'rejected')"/>
+                            <field name="scheduled_datetime"
+                                   readonly="state not in ('draft', 'to_approve', 'rejected', 'approved')"/>
+                        </group>
+                        <group name="group_workflow">
+                            <field name="requested_by"/>
+                            <field name="approved_by"/>
+                            <field name="approved_date"/>
+                            <field name="published_date"/>
+                            <field name="reject_reason" invisible="state != 'rejected'"/>
+                            <field name="company_id" groups="base.group_multi_company"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Caption &amp; Media" name="page_content">
+                            <group>
+                                <field name="caption" placeholder="Write the caption / hashtags here..."
+                                       readonly="state not in ('draft', 'rejected')"/>
+                                <field name="attachment_ids" widget="many2many_binary"
+                                       invisible="media_type == 'text'"
+                                       readonly="state not in ('draft', 'rejected')"/>
+                            </group>
+                        </page>
+                        <page string="Publishing Results" name="page_results">
+                            <field name="target_ids" readonly="1">
+                                <list decoration-danger="state == 'failed'"
+                                      decoration-success="state == 'posted'">
+                                    <field name="account_id"/>
+                                    <field name="platform"/>
+                                    <field name="state" widget="badge"/>
+                                    <field name="remote_url" widget="url"/>
+                                    <field name="attempt_count"/>
+                                    <field name="last_attempt"/>
+                                    <field name="error"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_social_post_list" model="ir.ui.view">
+        <field name="name">otm.social.post.list</field>
+        <field name="model">otm.social.post</field>
+        <field name="arch" type="xml">
+            <list string="Social Posts" decoration-danger="state in ('failed', 'rejected')"
+                  decoration-success="state == 'posted'" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="media_type"/>
+                <field name="account_ids" widget="many2many_tags"/>
+                <field name="scheduled_datetime"/>
+                <field name="requested_by"/>
+                <field name="state" widget="badge"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_social_post_kanban" model="ir.ui.view">
+        <field name="name">otm.social.post.kanban</field>
+        <field name="model">otm.social.post</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" create="1">
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <field name="title" class="fw-bold"/>
+                        <field name="name" class="text-muted"/>
+                        <field name="scheduled_datetime" widget="datetime"/>
+                        <field name="account_ids" widget="many2many_tags"/>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_social_post_calendar" model="ir.ui.view">
+        <field name="name">otm.social.post.calendar</field>
+        <field name="model">otm.social.post</field>
+        <field name="arch" type="xml">
+            <calendar string="Content Calendar" date_start="scheduled_datetime" mode="month"
+                      quick_create="0">
+                <field name="title"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_social_post_search" model="ir.ui.view">
+        <field name="name">otm.social.post.search</field>
+        <field name="model">otm.social.post</field>
+        <field name="arch" type="xml">
+            <search string="Social Posts">
+                <field name="name"/>
+                <field name="title"/>
+                <field name="caption"/>
+                <filter name="mine" string="My Posts" domain="[('requested_by', '=', uid)]"/>
+                <filter name="to_approve" string="Waiting Approval" domain="[('state', '=', 'to_approve')]"/>
+                <filter name="scheduled" string="Scheduled" domain="[('state', '=', 'approved'), ('scheduled_datetime', '!=', False)]"/>
+                <filter name="problem" string="Failed / Partial" domain="[('state', 'in', ('failed', 'partial'))]"/>
+                <separator/>
+                <group>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_type" string="Media Type" context="{'group_by': 'media_type'}"/>
+                    <filter name="group_requester" string="Requested By" context="{'group_by': 'requested_by'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_social_post" model="ir.actions.act_window">
+        <field name="name">Posts</field>
+        <field name="res_model">otm.social.post</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
+        <field name="search_view_id" ref="view_social_post_search"/>
+    </record>
+
+    <record id="action_social_post_to_approve" model="ir.actions.act_window">
+        <field name="name">To Approve</field>
+        <field name="res_model">otm.social.post</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'to_approve')]</field>
+        <field name="search_view_id" ref="view_social_post_search"/>
+    </record>
+</odoo>
